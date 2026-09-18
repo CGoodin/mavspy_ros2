@@ -294,7 +294,8 @@ ax_teleop.set_xlim(-1.1, 1.1)
 ax_teleop.set_ylim(-0.5, 2.0)
 
 # --- map artists ---
-scan_sc2d  = ax_map.scatter([], [], s=2, c=GRN, alpha=0.65, linewidths=0)
+scan_sc2d  = ax_map.scatter([], [], s=2, c=[], cmap='RdYlGn_r',
+                             vmin=-1.0, vmax=3.0, alpha=0.65, linewidths=0)
 traj_ln,   = ax_map.plot([], [], color=BLUE, lw=1.5, alpha=0.7)
 veh_dot,   = ax_map.plot([], [], 'o', color=BLUE, ms=8, zorder=5)
 hdg_arr    = ax_map.annotate('', xy=(0,1), xytext=(0,0),
@@ -351,9 +352,10 @@ for i, topic in enumerate(TOPICS):
     topic_boxes.append(box)
     # Show just the last segment of the topic name to fit in the box
     short = topic.split('/')[-1]
+    short = short[:12] + '..' if len(short) > 12 else short
     lbl = ax_topics.text(x + (box_w-0.01)/2, y + 0.33, short,
                           transform=ax_topics.transAxes,
-                          ha='center', va='center', fontsize=7, color=FG)
+                          ha='center', va='center', fontsize=6.5, color=FG)
     topic_labels.append(lbl)
 
 ax_topics.set_title('Topic health')
@@ -399,6 +401,7 @@ def update(_frame):
         box.set_edgecolor(color)
         box.set_linewidth(2)
         short = topic.split('/')[-1]
+        short = short[:12] + '..' if len(short) > 12 else short
         lbl.set_text(f'{short}\n{status}')
         lbl.set_color(color)
 
@@ -411,10 +414,13 @@ def update(_frame):
 
     # --- top-down map ---
     if scan:
-        # Points already in world frame
-        sx = [p[0] for p in scan]
-        sy = [p[1] for p in scan]
+        # Points already in world frame, color by height (z)
+        sx = np.array([p[0] for p in scan])
+        sy = np.array([p[1] for p in scan])
+        sz = np.array([p[2] for p in scan])
         scan_sc2d.set_offsets(np.c_[sx, sy])
+        scan_sc2d.set_array(sz)
+        scan_sc2d.set_clim(vmin=sz.min(), vmax=sz.max())
     if traj:
         tx, ty = zip(*traj)
         traj_ln.set_data(tx, ty)

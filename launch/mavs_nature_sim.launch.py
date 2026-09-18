@@ -63,22 +63,38 @@ def _find_nature_launch():
 
 
 def _find_viz():
+    # 1. Find via installed Python module (most reliable after colcon build)
+    try:
+        import mavspy_ros2
+        p = os.path.join(os.path.dirname(mavspy_ros2.__file__), 'mavs_viz_x11.py')
+        if os.path.exists(p):
+            return os.path.abspath(p)
+    except ImportError:
+        pass
+
+    # 2. Find via ament share directory
+    try:
+        pkg = get_package_share_directory('mavspy_ros2')
+        # installed scripts land in lib/mavspy_ros2/
+        p = os.path.join(os.path.dirname(pkg), '..', 'lib',
+                         'mavspy_ros2', 'mavs_viz_x11.py')
+        if os.path.exists(p):
+            return os.path.abspath(p)
+    except Exception:
+        pass
+
+    # 3. Search relative to this launch file
     this_dir = os.path.dirname(os.path.abspath(__file__))
     candidates = [
-        # installed share path: share/mavspy_ros2/launch/ -> ../../mavspy_ros2/
         os.path.join(this_dir, '..', 'mavspy_ros2', 'mavs_viz_x11.py'),
-        # source tree
         os.path.join(this_dir, '..', '..', 'mavspy_ros2', 'mavs_viz_x11.py'),
-        # workspace src
-        os.path.expanduser(
-            '~/ros2_ws/src/mavspy_ros2/mavspy_ros2/mavs_viz_x11.py'),
-        # cwd
         'mavs_viz_x11.py',
     ]
     for p in candidates:
         if os.path.exists(p):
             return os.path.abspath(p)
-    # Last resort: find it anywhere in the workspace
+
+    # 4. Walk the colcon workspace
     ws = os.environ.get('COLCON_PREFIX_PATH', '').split(':')[0]
     if ws:
         for root, _, files in os.walk(os.path.dirname(ws)):
@@ -149,9 +165,12 @@ def _launch_viz(context):
         print('[mavs_nature_sim] mavs_viz_x11.py not found — run it manually')
         return []
     from launch.actions import ExecuteProcess
+    # Pass DISPLAY through so X11 works inside Apptainer
+    display = os.environ.get('DISPLAY', ':0')
     return [ExecuteProcess(
         cmd=[sys.executable, viz],
         output='screen',
+        additional_env={'DISPLAY': display},
     )]
 
 
