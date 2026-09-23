@@ -59,7 +59,7 @@ import math
 import struct
 import threading
 import time
-
+import sys
 import rclpy
 from rclpy.node import Node
 from rclpy.executors import MultiThreadedExecutor
@@ -177,6 +177,7 @@ class MavsSimNode(Node):
         self.declare_parameter('init_z',        0.0)
         self.declare_parameter('init_heading',  0.0)
         self.declare_parameter('dt',            0.01)
+        self.declare_parameter('rain_rate',    0.0)
         self.declare_parameter('lidar_rate',    10.0)
         self.declare_parameter('odom_rate',     100.0)
         self.declare_parameter('lidar_height',  1.5)
@@ -190,6 +191,7 @@ class MavsSimNode(Node):
         init_z       = self.get_parameter('init_z').value
         init_heading = self.get_parameter('init_heading').value
         self._dt     = self.get_parameter('dt').value
+        self.rain_rate   = self.get_parameter('rain_rate').value
         lidar_rate   = self.get_parameter('lidar_rate').value
         odom_rate    = self.get_parameter('odom_rate').value
         lidar_h      = self.get_parameter('lidar_height').value
@@ -214,6 +216,7 @@ class MavsSimNode(Node):
 
         self._env = mavs.MavsEnvironment()
         self._env.SetScene(self._scene)
+        self._env.SetRainRate(self.rain_rate)
 
         # ---- MAVS vehicle ----
         self._vehicle = mavs.MavsRp3d()
@@ -272,9 +275,10 @@ class MavsSimNode(Node):
         self.create_subscription(Twist, 'nature/cmd_vel',
                                  self._cmd_vel_cb, 10)
 
-        self._lidar_every = max(1, int(round(
-            self.get_parameter('odom_rate').value /
-            self.get_parameter('lidar_rate').value)))
+        #self._lidar_every = max(1, int(round(
+        #    self.get_parameter('odom_rate').value /
+        #    self.get_parameter('lidar_rate').value)))
+        self._lidar_every = max(1, int(round(odom_rate / lidar_rate)))
 
         # Single thread for ALL mavs calls — lidar uses C++ threads internally
         # and must be called from the same thread as the physics update

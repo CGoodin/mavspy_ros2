@@ -224,6 +224,9 @@ def generate_launch_description():
         DeclareLaunchArgument('init_heading',
             default_value='0.0',
             description='Initial vehicle heading (rad)'),
+        DeclareLaunchArgument('rain_rate',
+            default_value='0.0',
+            description='Rain rate in mm/h'),    
     ]
 
     # Set env vars using plain strings (not LaunchConfiguration — avoids
@@ -252,6 +255,7 @@ def generate_launch_description():
                 'init_y':       float(context.launch_configurations.get('init_y', '0.0')),
                 'init_z':       float(context.launch_configurations.get('init_z', '0.0')),
                 'init_heading': float(context.launch_configurations.get('init_heading', '0.0')),
+                'rain_rate': float(context.launch_configurations.get('rain_rate', '0.0')),
             }],
         )]
 
