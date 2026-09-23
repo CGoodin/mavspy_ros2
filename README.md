@@ -54,7 +54,7 @@ export MAVS_DATA=$(pip show mavspy | awk '/^Location:/ {print $2}')/mavspy/data
 Next, launch a simulation using the following command.
 
 ```bash
-ros2 launch mavspy_ros2 mavs_nature_sim.launch.py scene_file:=${MAVS_DATA}/scenes/cavs_proving_ground.json waypoints_file:=~/mavs_ros2_ws/src/nature/config/waypoints_proving_ground_enu.yaml robot_description_file:=~/mavs_ros2_ws/src/nature/config/example_bot.urdf init_x:=-132.0 init_y:=318.0 init_heading:=-0.75
+ros2 launch mavspy_ros2 mavs_nature_sim.launch.py scene_file:=${MAVS_DATA}/scenes/cavs_proving_ground.json vehicle_file:=${MAVS_DATA}/vehicles/rp3d_vehicles/forester_2017_rp3d_tires.json waypoints_file:=~/mavs_ros2_ws/src/nature/config/waypoints_proving_ground_enu.yaml robot_description_file:=~/mavs_ros2_ws/src/nature/config/example_bot.urdf init_x:=-132.0 init_y:=318.0 init_heading:=-0.75 rain_rate:=0.0 lidar_model:=VLP-16
 ```
 
 This will launch the NATURE stack, a MAVS simulation node, and a visualization window for tracking the progress of the simulation. You can track the progress of the vehicle through the environment from the trajectory map on the left.
