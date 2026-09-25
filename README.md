@@ -22,7 +22,7 @@ After *mavspy* is installed, create a ROS2 workspace for building NATURE and mav
 
 ```bash
 cd
-mdkir mavs_ros2_ws
+mkdir mavs_ros2_ws
 cd mavs_ros2_ws
 mkdir src
 ```
@@ -33,6 +33,14 @@ Navigate to the workspaces src directory and clone the NATURE and mavspy_ros2 re
 cd ~/mavs_ros2_ws/src
 git clone https://github.com/CGoodin/nature-stack
 git clone https://github.com/CGoodin/mavspy_ros2.git
+```
+
+For the NATURE repo, set it to build for ROS2
+
+```bash
+cd ~/mavs_ros2_ws/src/nature
+cp package_ros2.xml package.xml
+cp CMakeLists_ros2.cmake  CMakeLists.txt
 ```
 
 To build the workspace, go back to the top-level workspace directory and use the ROS2 build system.
