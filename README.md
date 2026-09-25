@@ -11,7 +11,7 @@ First, navigate to your home directory, download the MAVS Python wheel, and inst
 ```bash
 cd
 curl -L -O https://github.com/CGoodin/mavspy/releases/download/v1.0.38/mavspy-1.0.38-py3-none-linux_x86_64.whl
-pip install mavspy-1.0.35-py3-none-linux_x86_64.whl
+pip install mavspy-1.0.38-py3-none-linux_x86_64.whl
 ```
 
 Note: The wheel file can be deleted after pip installation.
